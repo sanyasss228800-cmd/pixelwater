@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "pixelwater",
+  "version": "${version}",
+  "name": "Pixel Water",
+  "description": "Pixel-art water with soft white foam edges.",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.pixelwater.PixelWaterClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "minecraft": "1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
