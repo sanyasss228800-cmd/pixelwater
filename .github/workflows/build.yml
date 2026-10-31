@@ -6,6 +6,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate water textures
+        run: |
+          pip install pillow
+          python - <<'EOF'
+          import os, math, json
+          from PIL import Image
+          d = "src/main/resources/assets/minecraft/textures/block"
+          os.makedirs(d, exist_ok=True)
+          def make(name, size, frames):
+              img = Image.new("RGBA", (size, size * frames))
+              k = 16 / size
+              for f in range(frames):
+                  t = f / frames * 2 * math.pi
+                  for y in range(size):
+                      for x in range(size):
+                          X, Y = x * k, y * k
+                          v = (math.sin(X / 16 * 4 * math.pi + t)
+                               + math.sin(Y / 16 * 4 * math.pi - t)
+                               + math.sin((X + Y) / 16 * 2 * math.pi + t))
+                          if v > 2.1:    c = (255, 255, 255, 225)
+                          elif v > 0.8:  c = (232, 232, 232, 200)
+                          elif v > -0.8: c = (205, 205, 205, 190)
+                          else:          c = (175, 175, 175, 180)
+                          img.putpixel((x, f * size + y), c)
+              img.save(f"{d}/{name}.png")
+              json.dump({"animation": {"frametime": 2}}, open(f"{d}/{name}.png.mcmeta", "w"))
+          make("water_still", 16, 32)
+          make("water_flow", 32, 32)
+          EOF
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
